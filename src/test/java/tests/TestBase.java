@@ -9,7 +9,10 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
+import org.openqa.selenium.phantomjs.PhantomJSDriver;
+import org.openqa.selenium.phantomjs.PhantomJSDriverService;
 import org.openqa.selenium.remote.CapabilityType;
+import org.openqa.selenium.remote.DesiredCapabilities;
 import org.testng.ITestResult;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.AfterSuite;
@@ -35,13 +38,23 @@ public class TestBase extends AbstractTestNGCucumberTests {
 			driver = new ChromeDriver(chromeOptions());
 
 		} else if (browserName.equalsIgnoreCase("firefox")) {
-			System.setProperty("webdriver.gecko.driver", System.getProperty("user.dir") + "\\Drivers\\geckodriver.exe");
+			System.setProperty("webdriver.gecko.driver", 
+					System.getProperty("user.dir") + "\\Drivers\\geckodriver.exe");
 			driver = new FirefoxDriver(firefoxOptions());
 
 		} else if (browserName.equalsIgnoreCase("edge")) {
 			System.setProperty("webdriver.edge.driver",
 					System.getProperty("user.dir") + "\\Drivers\\MicrosoftWebDriver.exe");
 			driver = new EdgeDriver();
+			
+		} else if (browserName.equalsIgnoreCase("headless")) {
+			DesiredCapabilities caps = new DesiredCapabilities();
+			caps.setJavascriptEnabled(true);
+			caps.setCapability(PhantomJSDriverService.PHANTOMJS_EXECUTABLE_PATH_PROPERTY,
+					System.getProperty("user.dir") + "\\Drivers\\phantomjs.exe");
+			String[] phantomjsArgs = { "--web-security=no", "--ignore-ssl-errors=yes" };
+			caps.setCapability(PhantomJSDriverService.PHANTOMJS_CLI_ARGS, phantomjsArgs);
+			driver = new PhantomJSDriver(caps);
 		}
 
 		driver.manage().window().maximize();
